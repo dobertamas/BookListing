@@ -22,7 +22,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -44,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         mSearchBooksButton.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
 
-
                 mSearchTerm = mSearchTermEditText.getText().toString().trim();
                 if (mSearchTerm.isEmpty()) {
                     return;
@@ -52,22 +50,18 @@ public class MainActivity extends AppCompatActivity {
                 // Kick off an {@link AsyncTask} to perform the network request
                 BookAsyncTask task = new BookAsyncTask();
                 task.execute();
-
-
             }
         });
     }
 
-    // https://www.google.com/#q=soccer
-    private class BookAsyncTask extends AsyncTask<URL, Void, ArrayList<Book>> {
+    private class BookAsyncTask extends AsyncTask<URL, Void, Book[]> {
 
         final String LOG_TAG = BookAsyncTask.class.getSimpleName();
 
-        //ArrayList<Book> bookList;
-
-        @Override protected ArrayList<Book> doInBackground(URL... urls) {
+        @Override protected Book[] doInBackground(URL... urls) {
             // Create URL object
-            URL url = createUrl(GOOGLE_SEARCH_REQUEST_URL + mSearchTerm + "&key=AIzaSyDzeb_q3BZLDcETAF6xOf6B0B4X_VNNfpE");
+            URL url = createUrl(GOOGLE_SEARCH_REQUEST_URL + mSearchTerm + "&maxResults=10" + "&key=AIzaSyDzeb_q3BZLDcETAF6xOf6B0B4X_VNNfpE");
+            assert url != null;
             Log.i(LOG_TAG, " Url ceated" + url.getPath());
 
             // Perform HTTP request to the URL and receive a JSON response back
@@ -78,21 +72,25 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "Problem making the HTTP request.", e);
             }
 
-            ArrayList<Book> bookList = new ArrayList<>();
-            bookList = extractFeatureFromJson(jsonResponse);
-            return bookList;
+            Book[] bookArray = new Book[10];
+            
+            try {
+                bookArray = extractFeatureFromJson(jsonResponse);
+                Log.i(LOG_TAG, "extracted");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return bookArray;
         }
 
         /**
          * Send data from ArrayList of books (which was the result of the
          * {@link BookAsyncTask}) to BookListActivity.
          */
-        @Override protected void onPostExecute(ArrayList<Book> books) {
-            String[] bookArray = new String[books.size()];
-            bookArray = books.toArray(bookArray);
+        @Override protected void onPostExecute(Book[] books) {
 
             Intent bookListIntent = new Intent(MainActivity.this, BookListActivity.class);
-            // bookListIntent.setData(bookArray);
+            //bookListIntent.setData(books);
             startActivity(bookListIntent);
         }
 
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
          * Returns new URL object from the given string URL.
          */
         private URL createUrl(String urlString) {
-            URL url = null;
+            URL url;
             try {
                 url = new URL(urlString);
             } catch (MalformedURLException exception) {
@@ -175,35 +173,32 @@ public class MainActivity extends AppCompatActivity {
          * Return an ArrayList of {@link Book} objects by parsing out information
          * about the first earthquake from the input earthquakeJSON string.
          */
-        private ArrayList<Book> extractFeatureFromJson(String booksJSON) {
+        private Book[] extractFeatureFromJson(String booksJSON) throws JSONException {
             // If the JSON string is empty or null, then return early.
             if (TextUtils.isEmpty(booksJSON)) {
                 return null;
             }
 
-            try {
-                JSONObject baseJsonResponse = new JSONObject(booksJSON);
-                JSONArray featureArray = baseJsonResponse.getJSONArray("features");
+            JSONObject baseJsonResponse = new JSONObject(booksJSON);
+            JSONArray itemsArray = baseJsonResponse.getJSONArray("items");
 
-                // If there are results in the features array
-                if (featureArray.length() > 0) {
-                    // Extract out the first feature (which is an earthquake)
-                    JSONObject firstFeature = featureArray.getJSONObject(0);
-                    JSONObject items = firstFeature.getJSONObject("items");
+            Book[] books = new Book[itemsArray.length()];
 
-                    // Extract out the title, time, and tsunami values
-                    /*String title = properties.getString("title");
-                    long time = properties.getLong("time");
-                    int tsunamiAlert = properties.getInt("tsunami");*/
+            for (int x = 0; x < itemsArray.length(); x++) {
+                JSONObject bookItem = itemsArray.getJSONObject(x);
+                JSONObject volumeInfoObject = bookItem.getJSONObject("volumeInfo");
+                Book bookLoopItem = new Book();
+                bookLoopItem.setTitle(volumeInfoObject.getString("title"));
 
-                    // Create a new {@link Event} object
-                    // return new Event(title, time, tsunamiAlert);
-                }
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "Problem parsing the JSON results", e);
+                books[x] = bookLoopItem;
+
+
             }
-            return null;
+
+            return books;
+
         }
 
     }
+
 }
