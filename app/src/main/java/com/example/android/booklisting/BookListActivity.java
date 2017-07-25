@@ -7,14 +7,13 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 public class BookListActivity extends AppCompatActivity {
-    private ArrayList<Book> bookList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
 
-        bookList = new ArrayList<>();
+        ArrayList<Book> bookList = new ArrayList<>();
         bookList.add(new Book("A", "B"));
         bookList.add(new Book("c", "d"));
 

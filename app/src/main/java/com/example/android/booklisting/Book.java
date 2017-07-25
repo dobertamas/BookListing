@@ -1,27 +1,27 @@
 package com.example.android.booklisting;
 
-public class Book {
+class Book {
     private String mTitle;
     private String mAuthor;
 
-    public Book(String title, String author) {
+    Book(String title, String author) {
         mTitle = title;
         mAuthor = author;
     }
 
-    public String getTitle() {
+    String getTitle() {
         return mTitle;
     }
 
-    public void setTitle(String title) {
+   /* public void setTitle(String title) {
         mTitle = title;
-    }
+    }*/
 
-    public String getAuthor() {
+    String getAuthor() {
         return mAuthor;
     }
 
-    public void setAuthor(String author) {
+    /*public void setAuthor(String author) {
         mAuthor = author;
-    }
+    }*/
 }

@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 mSearchTerm = mSearchTermEditText.getText().toString().trim();
-                if (mSearchTerm == null || mSearchTerm.isEmpty()) {
+                if (mSearchTerm.isEmpty()) {
                     return;
                 }
                 // Kick off an {@link AsyncTask} to perform the network request
