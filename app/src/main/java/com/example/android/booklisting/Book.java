@@ -6,23 +6,9 @@ import android.os.Parcelable;
 class Book implements Parcelable {
     private String mTitle;
     private String mAuthor;
-    //private String[] mAuthors;
-
-  /*  Book(String title, String author) {
-        mTitle = title;
-        mAuthor = author;
-    }*/
 
     Book() {
     }
-
-    /*public String[] getAuthors() {
-        return mAuthors;
-    }
-
-    public void setAuthors(String[] authors) {
-        mAuthors = authors;
-    }*/
 
     String getTitle() {
         return mTitle;
@@ -36,9 +22,9 @@ class Book implements Parcelable {
         return mAuthor;
     }
 
-    /*void setAuthor(String author) {
+    void setAuthor(String author) {
         mAuthor = author;
-    }*/
+    }
 
     @Override public int describeContents() {
         return 0;
@@ -47,7 +33,6 @@ class Book implements Parcelable {
     @Override public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mTitle);
         dest.writeString(mAuthor);
-
     }
 
     private Book(Parcel in) {

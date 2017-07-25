@@ -190,15 +190,17 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject bookItem = itemsArray.getJSONObject(x);
                 JSONObject volumeInfoObject = bookItem.getJSONObject("volumeInfo");
                 Book bookLoopItem = new Book();
+
                 bookLoopItem.setTitle(volumeInfoObject.getString("title"));
-
+                JSONArray authorsArray = volumeInfoObject.getJSONArray("authors");
+                if (authorsArray.length() > 0) {
+                    String author = authorsArray.getString(0);
+                    Log.i(LOG_TAG, " author was: " + author);
+                    bookLoopItem.setAuthor(author);
+                }
                 books[x] = bookLoopItem;
-
-
             }
-
             return books;
-
         }
 
     }
