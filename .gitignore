@@ -25,6 +25,7 @@ hs_err_pid*
 
 .gradle
 .idea
-app/app.iml
+app/*iml
 .build/android-profile/*
 .build/android-profile/*rawproto
+*.rawproto
