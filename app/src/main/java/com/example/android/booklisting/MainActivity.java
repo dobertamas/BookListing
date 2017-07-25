@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     String mSearchTerm;
 
+    public static final String BOOK_LIST_ARRAY = "BOOK_LIST_ARRAY";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             // Create URL object
             URL url = createUrl(GOOGLE_SEARCH_REQUEST_URL + mSearchTerm + "&maxResults=10" + "&key=AIzaSyDzeb_q3BZLDcETAF6xOf6B0B4X_VNNfpE");
             assert url != null;
-            Log.i(LOG_TAG, " Url ceated" + url.getPath());
+            Log.i(LOG_TAG, " Url created" + url.getPath());
 
             // Perform HTTP request to the URL and receive a JSON response back
             String jsonResponse = "";
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             Book[] bookArray = new Book[10];
-            
+
             try {
                 bookArray = extractFeatureFromJson(jsonResponse);
                 Log.i(LOG_TAG, "extracted");
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         @Override protected void onPostExecute(Book[] books) {
 
             Intent bookListIntent = new Intent(MainActivity.this, BookListActivity.class);
-            //bookListIntent.setData(books);
+            bookListIntent.putExtra(BOOK_LIST_ARRAY, books);
             startActivity(bookListIntent);
         }
 

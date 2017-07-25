@@ -10,15 +10,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 class BookAdapter extends ArrayAdapter<Book> {
 
     private static final String LOG_TAG = BookAdapter.class.getSimpleName();
 
     //private Context mContext;
+    //private Book[] mBooks;
 
-    BookAdapter(@NonNull Context context, @NonNull ArrayList<Book> books) {
+    BookAdapter(@NonNull Context context, @NonNull Book[] books) {
         super(context, 0, books);
         //mContext = context;
     }
