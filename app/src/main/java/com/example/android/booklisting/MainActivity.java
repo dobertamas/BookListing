@@ -1,5 +1,6 @@
 package com.example.android.booklisting;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -28,8 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         mSearchBooksButton.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                /*Intent productListIntent = new Intent(MainActivity.this, ProductDetailActivity.class);
-                startActivity(productListIntent);*/
+
 
                 mSearchTerm = mSearchTermEditText.getText().toString().trim();
                 if (mSearchTerm == null || mSearchTerm.isEmpty()) {
@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
                 // Kick off an {@link AsyncTask} to perform the network request
                 BookAsyncTask task = new BookAsyncTask();
                 task.execute();
+
+                Intent bookListIntent = new Intent(MainActivity.this, BookListActivity.class);
+                startActivity(bookListIntent);
             }
         });
     }
