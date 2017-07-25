@@ -4,10 +4,15 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             ArrayList<Book> bookList = new ArrayList<>();
+            bookList = extractFeatureFromJson(jsonResponse);
             return bookList;
         }
 
@@ -83,10 +89,10 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override protected void onPostExecute(ArrayList<Book> books) {
             String[] bookArray = new String[books.size()];
-            bookArray=books.toArray(bookArray);
+            bookArray = books.toArray(bookArray);
 
             Intent bookListIntent = new Intent(MainActivity.this, BookListActivity.class);
-           // bookListIntent.setData(bookArray);
+            // bookListIntent.setData(bookArray);
             startActivity(bookListIntent);
         }
 
@@ -165,6 +171,39 @@ public class MainActivity extends AppCompatActivity {
             return output.toString();
         }
 
+        /**
+         * Return an ArrayList of {@link Book} objects by parsing out information
+         * about the first earthquake from the input earthquakeJSON string.
+         */
+        private ArrayList<Book> extractFeatureFromJson(String booksJSON) {
+            // If the JSON string is empty or null, then return early.
+            if (TextUtils.isEmpty(booksJSON)) {
+                return null;
+            }
+
+            try {
+                JSONObject baseJsonResponse = new JSONObject(booksJSON);
+                JSONArray featureArray = baseJsonResponse.getJSONArray("features");
+
+                // If there are results in the features array
+                if (featureArray.length() > 0) {
+                    // Extract out the first feature (which is an earthquake)
+                    JSONObject firstFeature = featureArray.getJSONObject(0);
+                    JSONObject items = firstFeature.getJSONObject("items");
+
+                    // Extract out the title, time, and tsunami values
+                    /*String title = properties.getString("title");
+                    long time = properties.getLong("time");
+                    int tsunamiAlert = properties.getInt("tsunami");*/
+
+                    // Create a new {@link Event} object
+                    // return new Event(title, time, tsunamiAlert);
+                }
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, "Problem parsing the JSON results", e);
+            }
+            return null;
+        }
 
     }
 }
