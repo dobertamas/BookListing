@@ -8,13 +8,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceSmall"
-        android:textColor="#2B3D4D"/>
+        android:textColor="@color/colorListItem"/>
 
     <TextView
         android:id="@+id/list_item_author"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceSmall"
-        android:textColor="#2B3D4D"/>
+        android:textColor="@color/colorListItem"/>
 
 </LinearLayout>

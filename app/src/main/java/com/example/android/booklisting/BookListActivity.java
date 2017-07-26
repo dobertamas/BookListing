@@ -8,12 +8,18 @@ import android.widget.ListView;
 
 import java.util.Arrays;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 public class BookListActivity extends AppCompatActivity {
+
+    @InjectView(R.id.list) ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
+        ButterKnife.inject(this);
 
         Intent intent = getIntent();
         Parcelable[] parcelables = intent.getParcelableArrayExtra(MainActivity.BOOK_LIST_ARRAY);
@@ -23,14 +29,9 @@ public class BookListActivity extends AppCompatActivity {
         // The adapter knows how to create list items for each item in the list.
         BookAdapter bookAdapter = new BookAdapter(this, bookList);
 
-        // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
-        // There should be a {@link ListView} with the view ID called list, which is declared in the
-        // activity_book_list.xml layout file.
-        ListView listView = (ListView) findViewById(R.id.list);
-
         // Make the {@link ListView} use the {@link AttractionAdapter} we created above, so that
         // the {@link ListView} will display list items for each {@link Attraction} in the list.
-        listView.setAdapter(bookAdapter);
+        mListView.setAdapter(bookAdapter);
     }
 
 }
