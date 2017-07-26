@@ -1,6 +1,9 @@
 package com.example.android.booklisting;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     String mSearchTerm;
 
     public static final String BOOK_LIST_ARRAY = "BOOK_LIST_ARRAY";
+    static final Integer READ_TIMEOUT_VALUE = 10000; /* milliseconds */
+    static final Integer CONNECT_TIMEOUT_VALUE = 15000; /* milliseconds */
+    static final Integer BOOK_LIST_SIZE = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
                 if (mSearchTerm.isEmpty()) {
                     return;
                 }
+
+                if (!isOnline()) {
+                    Toast.makeText(MainActivity.this, "No connectivity!", Toast.LENGTH_LONG).show();
+                    return;
+
+                }
                 // Kick off an {@link AsyncTask} to perform the network request
                 BookAsyncTask task = new BookAsyncTask();
                 task.execute();
@@ -56,13 +69,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public boolean isOnline() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
     private class BookAsyncTask extends AsyncTask<URL, Void, Book[]> {
 
         final String LOG_TAG = BookAsyncTask.class.getSimpleName();
 
+        static final String UNKNOWN_AUTHOR = "Unknown author";
+
         @Override protected Book[] doInBackground(URL... urls) {
             // Create URL object
-            URL url = createUrl(GOOGLE_SEARCH_REQUEST_URL + mSearchTerm + "&maxResults=10" + "&key=AIzaSyDzeb_q3BZLDcETAF6xOf6B0B4X_VNNfpE");
+            URL url = createUrl(GOOGLE_SEARCH_REQUEST_URL + mSearchTerm + "&maxResults=" + BOOK_LIST_SIZE + "&key=AIzaSyDzeb_q3BZLDcETAF6xOf6B0B4X_VNNfpE");
             assert url != null;
             Log.i(LOG_TAG, " Url created" + url.getPath());
 
@@ -74,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "Problem making the HTTP request.", e);
             }
 
-            Book[] bookArray = new Book[10];
+            Book[] bookArray = new Book[BOOK_LIST_SIZE];
 
             try {
                 bookArray = extractFeatureFromJson(jsonResponse);
@@ -126,8 +148,8 @@ public class MainActivity extends AppCompatActivity {
             try {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setReadTimeout(10000 /* milliseconds */);
-                urlConnection.setConnectTimeout(15000 /* milliseconds */);
+                urlConnection.setReadTimeout(READ_TIMEOUT_VALUE);
+                urlConnection.setConnectTimeout(CONNECT_TIMEOUT_VALUE);
                 urlConnection.connect();
 
                 // If the request was successful (response code 200),
@@ -192,11 +214,20 @@ public class MainActivity extends AppCompatActivity {
                 Book bookLoopItem = new Book();
 
                 bookLoopItem.setTitle(volumeInfoObject.getString("title"));
-                JSONArray authorsArray = volumeInfoObject.getJSONArray("authors");
-                if (authorsArray.length() > 0) {
-                    String author = authorsArray.getString(0);
-                    Log.i(LOG_TAG, " author was: " + author);
-                    bookLoopItem.setAuthor(author);
+
+                // Sometimes there is no authors info inside the JSON response
+                try {
+                    JSONArray authorsArray = volumeInfoObject.getJSONArray("authors");
+                    if (authorsArray.length() > 0) {
+                        // Right now we are interesting in only one author
+                        String author = authorsArray.getString(0);
+                        Log.i(LOG_TAG, " author was: " + author);
+                        bookLoopItem.setAuthor(author);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    // catching the JSONException and adding unknown
+                    bookLoopItem.setAuthor(UNKNOWN_AUTHOR);
                 }
                 books[x] = bookLoopItem;
             }
